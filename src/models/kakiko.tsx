@@ -1,31 +1,28 @@
 import React from "react";
 
 export class Kakiko {
-    number: number;
     name: string;
-    time: string;
+    time: Date;
     userid: string;
     contenttext: string;
   
-    constructor(number: number, name: string, time: string, userid: string, contenttext: string) {
-      this.number = number;
-      this.name = name;
-      this.time = time;
-      this.userid = userid;
+    constructor(name: string, contenttext: string) {
+      this.name = name ? name : "名無しさん";
+      this.time = new Date();
+      this.userid = Math.random().toString(32).substring(2);
       this.contenttext = contenttext;
     }
   }
   
   export type KakikoProps = {
-    number: number;
     name: string;
-    time: string;
+    time: Date;
     userid: string;
     contenttext: string;
   }
 
-export class KakikoForm extends React.Component<{}, {username: string, useremail: string, content: string}> {
-  constructor(props: {}) {
+export class KakikoForm extends React.Component<{register_func: Function}, {username: string, useremail: string, content: string}> {
+  constructor(props: {register_func: Function}) {
     super(props);
     this.state = {username: '', useremail: '', content: ''};
   }
@@ -55,20 +52,21 @@ export class KakikoForm extends React.Component<{}, {username: string, useremail
       return;
     }
     e.preventDefault();
-    console.log(`username: ${this.state.username} useremail: ${this.state.useremail} content: ${this.state.content}`)
+    const kakiko = new Kakiko(this.state.username, this.state.content);
+    this.props.register_func(kakiko);
+    this.setState({username: '', useremail: '', content: ''});
   }
 
   render() {
     return (
       <form>
-        <input type="submit" value="書き込む" onClick={this.handleOnClick}/>
-        <label>名前:
-          <input type="text" value={this.state.username} onChange={this.handleOnUserNameChange}/>
-        </label>
-        <label>E-mail:
-          <input type="email" value={this.state.useremail} onChange={this.handleOnUserEmailChange}/>
-        </label>
+          <input type="text" placeholder="名前(省略可)" value={this.state.username} onChange={this.handleOnUserNameChange}/>
+          <input type="email" placeholder="E-mail(省略可)" value={this.state.useremail} onChange={this.handleOnUserEmailChange}/>
           <textarea value={this.state.content} onChange={this.handleOnContentChange}></textarea>
+          <div className="submit-space">
+            <input type="submit" value="書き込みをする" onClick={this.handleOnClick}/>
+            <span>※書き込み反映には時間が掛かる場合があります※</span>
+          </div>
       </form>
     )
   }
